@@ -1,0 +1,172 @@
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+}
+
+#main-header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: #ff6800;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  transition: background-color 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  opacity: 1; /* Header initially visible */
+}
+
+#main-header.transparent {
+  background-color: #ff6800;
+  opacity: 0.9; /* Slightly transparent */
+}
+
+#main-header .logo {
+  margin-right: auto;
+}
+
+#main-header .logo img {
+  max-width: 60%;
+  height: auto;
+}
+
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+nav li {
+  margin: 0 18px;
+}
+
+nav a {
+  text-decoration: none;
+  color: #ffffff;
+  font-weight: bold;
+  transition: color 0.3s ease-in-out;
+}
+
+nav a.active,
+nav a:hover {
+  color: #ff0000;
+  border-bottom: 3px solid #fff; /* Add a white bottom border for active/hover state */
+}
+
+section {
+  margin-top: 80px;
+  padding: 20px;
+}
+
+#banner {
+  background-image: url('images/banner.jpg');
+  background-size: cover;
+  background-position: center;
+  height: 450px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  transform: skewY(-2deg); /* Skew effect for the bottom edge of the banner */
+  transition: transform 0.3s ease-in-out;
+}
+
+#banner:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 20%;
+  background: linear-gradient(to top right, transparent, #fff 50%, transparent);
+}
+
+.banner-content {
+  z-index: 1;
+}
+
+#banner {
+  background-attachment: fixed;
+  background-position: center;
+  transition: transform 0.3s ease-in-out; /* Tambahkan transisi untuk efek parallax */
+}
+
+#banner h1 {
+  font-size: 3em;
+  margin-bottom: 10px;
+}
+
+#banner p {
+  font-size: 1.5em;
+}
+
+#banner:hover {
+  transform: skewY(0);
+  background-position: center 10%; /* Ubah posisi latar belakang banner saat hover */
+}
+
+/* Add parallax effect on scroll */
+body {
+  height: 200vh; /* Adjust as needed based on your content */
+}
+
+/* Add styles for post cards, pagination, etc. as needed */
+.post-card {
+  display: flex;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.post-thumbnail {
+  flex-shrink: 0;
+  width: 200px;
+  overflow: hidden;
+}
+
+.post-thumbnail img {
+  width: 100%;
+  height: auto;
+}
+
+.post-details {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+.post-details h2 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.post-details p {
+  margin: 0;
+}
+
+/* Styles for pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.page-link {
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+/* Add any other styles you need */

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="Suitmedia.css">
+  <script src="D:/Downloads/TaskSuitmedia/Lazyload.js"></script>
+  <title>Your Website</title>
+</head>
+
+<body>
+
+  <header id="main-header">
+    <div class="logo">
+      <img src="images/logo.png" alt="Your Company Logo">
+    </div>
+    <nav>
+      <ul>
+        <li><a href="#work">Work</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#ideas">Ideas</a></li>
+        <li><a href="#careers">Careers</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section id="banner">
+    <div class="banner-content">
+      <h1>Ideas</h1>
+      <p>Where all our great things begin</p>
+    </div>
+  </section>
+
+  <section id="list-post">
+    <div class="post-container">
+      <div class="post-controls">
+        <label for="showPerPage">Show Per Page:</label>
+        <select id="showPerPage" onchange="fetchPosts()">
+          <option value="8">8</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+        </select>
+
+        <label for="sort">Sort By:</label>
+        <select id="sort" onchange="fetchPosts()">
+          <option value="published_at">Newest</option>
+          <option value="-published_at">Oldest</option>
+        </select>
+      </div>
+      <div class="post-cards" id="postCards">
+        <!-- Cards will be dynamically added here using JavaScript -->
+      </div>
+      <div id="showingInfo"></div>
+      <div class="pagination" id="pagination">
+        <!-- Pagination links will be dynamically added here using JavaScript -->
+      </div>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      fetchPosts();
+      highlightActiveMenu();
+    });
+
+    async function fetchPosts() {
+    const apiUrl = 'https://suitmedia-backend.suitdev.com/api/ideas';
+    const sort = document.getElementById('sort').value;
+    const perPage = document.getElementById('showPerPage').value;
+
+    try {
+      const response = await fetch(`${apiUrl}?page[number]=1&page[size]=${perPage}&append[]=small_image&append[]=medium_image&sort=${sort}`, {
+  method: 'GET',
+});
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data && data.data) {
+        renderPosts(data.data);
+        renderPagination(data.meta);
+      } else {
+        console.error('Invalid data format received.');
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }
+
+    function renderPosts(posts) {
+  const postCards = document.getElementById('postCards');
+  postCards.innerHTML = '';
+
+  const showingInfo = document.getElementById('showingInfo');
+  showingInfo.innerHTML = `Showing 1-${posts.length} of ${posts.length}`;
+
+  if (posts && posts.length > 0) {
+    posts.slice(0, 8).forEach(post => {
+      const card = document.createElement('div');
+      card.classList.add('post-card');
+
+      card.innerHTML = `
+        <img src="${post.attributes.small_image}" data-src="${post.attributes.medium_image}" alt="${post.attributes.title}" class="lazy">
+        <div class="post-details">
+          <h2>${truncateTitle(post.attributes.title)}</h2>
+          <p>${post.attributes.description}</p>
+        </div>
+      `;
+
+      // Batasan tinggi title pada card
+      const postDetails = card.querySelector('.post-details');
+      postDetails.style.maxHeight = '4.5em'; // Sesuaikan dengan tinggi yang diinginkan
+      postDetails.style.overflow = 'hidden';
+      postDetails.style.textOverflow = 'ellipsis';
+      postDetails.style.display = '-webkit-box';
+      postDetails.style.WebkitBoxOrient = 'vertical';
+      postDetails.style.WebkitLineClamp = '3';
+
+      postCards.appendChild(card);
+    });
+
+    var lazyLoadInstance = new LazyLoad({
+      elements_selector: ".lazy"
+    });
+  } else {
+    console.error('Posts data is empty.');
+  }
+}
+
+
+    function renderPagination(meta) {
+      const pagination = document.getElementById('pagination');
+      pagination.innerHTML = '';
+
+      const showingInfo = document.getElementById('showingInfo');
+      showingInfo.innerHTML += ` | Page ${meta.currentPage} of ${meta.totalPages}`;
+
+      if (meta && meta.totalPages) {
+        for (let i = 1; i <= meta.totalPages; i++) {
+          const pageLink = document.createElement('span');
+          pageLink.textContent = i;
+          pageLink.classList.add('page-link');
+
+          pageLink.addEventListener('click', function () {
+            fetchPostsByPage(i);
+          });
+
+          pagination.appendChild(pageLink);
+        }
+      } else {
+        console.error('Invalid pagination data.');
+      }
+    }
+
+    async function fetchPostsByPage(pageNumber) {
+      const apiUrl = 'https://suitmedia-backend.suitdev.com/api/ideas';
+      const sort = document.getElementById('sort').value;
+      const perPage = document.getElementById('showPerPage').value;
+
+      try {
+        const response = await fetch(`${apiUrl}?page[number]=${pageNumber}&page[size]=${perPage}&append[]=small_image&append[]=medium_image&sort=${sort}`);
+        const data = await response.json();
+
+        renderPosts(data.data);
+        renderPagination(data.meta);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+
+    function truncateTitle(title) {
+      const words = title.split(' ');
+      if (words.length > 5) {
+        return words.slice(0, 5).join(' ') + '...';
+      }
+      return title;
+    }
+
+    function highlightActiveMenu() {
+      const currentPath = window.location.pathname;
+      const navLinks = document.querySelectorAll('nav a');
+
+      navLinks.forEach(link => {
+        const linkPath = link.getAttribute('href').substring(1);
+        if (currentPath.includes(linkPath)) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+    }
+  </script>
+
+<script>
+  var prevScrollpos = window.pageYOffset;
+  window.onscroll = function () {
+    var currentScrollPos = window.pageYOffset;
+    var header = document.getElementById("main-header");
+
+    if (prevScrollpos > currentScrollPos) {
+      header.style.top = "0";
+      header.classList.remove("transparent");
+    } else {
+      header.style.top = "-80px";
+      header.classList.add("transparent");
+    }
+
+    prevScrollpos = currentScrollPos;
+    highlightActiveMenu(); // Panggil fungsi untuk menandai menu yang aktif
+  };
+</script>
+
+</body>
+
+</html>
